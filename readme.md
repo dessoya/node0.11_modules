@@ -1,3 +1,3 @@
 Modules
 
-	class		- ооп
+	class		- РѕРѕРї
