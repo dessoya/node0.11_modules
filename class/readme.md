@@ -30,6 +30,21 @@ var AnotherClass = SomeClass.inherit({
 	// constructor
 	onCreate: function(args) {
 		this.foo();
+	},
+
+	bar: function() {
 	}
 })
+```
+
+### Class multi inheritance
+
+```javascript
+var BigClass = SomeClass.inherit({
+	// constructor
+	onCreate: function(args) {
+		SomeClass.constructor(this)(args);
+		AnotherClass.constructor(this)(args);
+	}
+}, AnotherClass)
 ```

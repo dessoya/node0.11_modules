@@ -31,14 +31,13 @@ Class.prototype = {
 
 		childContructor.create = this.create;
 		childContructor.inherit = this.inherit;
-		childContructor.asParent = this.asParent;
+		childContructor.constructor = this.constructor;
 
         return childContructor;
 	},	
 
-	asParent: function(e, funcName) {
-		if(!funcName) return this.prototype.parent.onCreate.bind(e);
-		return this.prototype.parent[funcName].bind(e);
+	constructor: function(object) {
+		return this.prototype.onCreate.bind(object);
 	},
 
 	create: function() {
