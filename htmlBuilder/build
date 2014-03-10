@@ -1,0 +1,4 @@
+#!/bin/node
+'use strict'
+
+console.log('html builder')
