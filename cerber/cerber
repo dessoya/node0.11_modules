@@ -1,0 +1,51 @@
+#!/bin/node --harmony
+'use strict';
+
+var cerber = require('./index.js')
+
+var configPath = null, command = null;
+function setCommand(c) {
+	if(command) {
+		console.log('Error: command conflict '+command+' and '+c);	
+		process.exit();
+	}
+	else {
+		command = c;
+	}
+}
+var p = 2; while(p < process.argv.length) {
+	var item = process.argv[p ++];
+	switch(item) {
+	case 'start':
+		setCommand(item);
+		break;
+	case 'stop':
+		setCommand(item);
+		break;
+	case 'restart':
+		setCommand(item);
+		break;
+	case 'daemon':
+		setCommand(item);
+		break;
+	default:
+		if(null === configPath) configPath = item;
+		else {
+			console.log('unknown option or command "'+item+"'");
+			process.exit();
+		}
+	}
+}
+
+if(null === configPath) configPath = process.cwd() + '/cerber.json';
+if(configPath[0] === '.') configPath = process.cwd() + configPath.substr(1);
+console.log('use config '+configPath);
+
+if(command) {	
+	var config = cerber.loadConfig(configPath);
+	cerber[command](configPath, config);
+}
+else {
+	console.log('Error: absent command');
+	console.log('start|stop|restart');
+}
