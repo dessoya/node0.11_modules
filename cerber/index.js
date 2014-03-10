@@ -33,7 +33,7 @@ var Loger = Class.inherit({
 
 		var d = new Date();
 
-		var datestring = '' + d.getUTCFullYear() + '-' + this.format2(d.getUTCMonth()) + '-' + this.format2(d.getUTCDate()) + ' ' + this.format2(d.getUTCHour()) + ':' this.format2(d.getUTCMinutes()) + ':' + this.format2(d.getUTCSeconds());
+		var datestring = '' + d.getUTCFullYear() + '-' + this.format2(d.getUTCMonth()) + '-' + this.format2(d.getUTCDate()) + ' ' + this.format2(d.getUTCHours()) + ':' + this.format2(d.getUTCMinutes()) + ':' + this.format2(d.getUTCSeconds());
 
 		this.log_fd.write(datestring + ' [' + (pid_ ? pid_ : this.pid) + '] ' + m + "\n");
 	}
@@ -291,6 +291,7 @@ function restart(configPath, config, callback) {
 }
 
 function initService() {
+
 	for(var i = 0, l = process.argv.length; i < l; i++) {
 		if(process.argv[i] === optionCerberConfig) {
 			if(i + 1 < l) {
@@ -298,6 +299,11 @@ function initService() {
 				var config = JSON.parse(fs.readFileSync(process.argv[i + 1]));
 				process.title = config.name + ':service';
 				console.log('starting '+config.name+'...');
+				if(config.service_user) {
+					// todo: check for exists user
+					var info = posix.getpwnam(config.service_user)
+					posix.setuid(info[PASSWD_UID]);
+				}
 			}
 		}
 	}

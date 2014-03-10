@@ -58,6 +58,7 @@ var StaticLoader = Class.inherit({
 	onCreate: function() {
 		this.files = {};
 		this.interval = setInterval(this.onRefreshFiles.bind(this), 1500);
+		process.on('SIGINT', this.stop.bind(this));
 	},
 	stop: function() {
 		clearInterval(this.interval);
@@ -100,7 +101,7 @@ var StaticLoader = Class.inherit({
 	}
 });
 
-var staticLoader = StaticLoader.create();
+// var staticLoader = StaticLoader.create();
 
 var StaticRequest = Request.inherit({
 
