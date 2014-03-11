@@ -1,6 +1,6 @@
 'use strict'
 
-var Class = function(){}
+var Class = new Function
 
 Class.prototype = {
 
