@@ -15,8 +15,9 @@ global.console.showError = function(err) {
 		console.err(err.stack,{depth:null});
 	}
 	else {
-		console.err(util.inspect(err,{depth:null}));
-		console.err(new Error().stack,{depth:null});
+		var err = Common.create(err);
+		err.stack.shift();
+		console.showError(err);
 	}
 }
 
