@@ -12,7 +12,7 @@ global.console.showError = function(err) {
 		console.err(err.error+'\n'+err.stack.join('\n'));
 	}
 	else if(err instanceof Error) {
-		console.err(err.stack,{depth:null});
+		console.showError(Common.create(err));
 	}
 	else {
 		var err = Common.create(err);
@@ -36,7 +36,7 @@ var Common = Class.inherit({
 				for(var name in stack) this[name] = stack[name];
 			}
 			this.stack = error.stack.split('\n');
-			this.error = this.stack.shift();
+			this.error = this.stack.shift().substr(7);
 		}
 		else {
 			this.error = error;
@@ -50,27 +50,20 @@ var Common = Class.inherit({
 
 var errorCatchers = [], listener = false;
 function errorCatcher(err) {
+/*
 	if(err.code === 'PROTOCOL_ENQUEUE_AFTER_QUIT') {
 		process.exit(0);
 	}
 	else {
+*/
 		var l = errorCatchers.length, fatal = false; while(l--) {
 			fatal = errorCatchers[l](err);
 			if(fatal) break;
 		}
 		console.err('Caught exception:');
-		if(err instanceof Common) {
-			console.err(err.error+'\n'+err.stack.join('\n'));
-		}
-		else if(err instanceof Error) {
-			console.err(err.stack,{depth:null});
-		}
-		else {
-			console.err(util.inspect(err,{depth:null}));
-			console.err(new Error().stack,{depth:null});
-		}
+		console.showError(err);
 		if(fatal) process.exit(200);
-	}
+//	}
 }
 
 function activateCatcher(catcher) {
@@ -81,7 +74,14 @@ function activateCatcher(catcher) {
     if(catcher) errorCatchers.push(catcher);
 }
 
+function removeCatcher() {
+	process.removeListener('uncaughtException', errorCatcher)
+	errorCatchers = [];
+	listener = false;
+}
+
 module.exports = {
 	Common:				Common,
 	activateCatcher:	activateCatcher,
+	removeCatcher:		removeCatcher,
 }
