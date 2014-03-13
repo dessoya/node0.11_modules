@@ -23,13 +23,14 @@ console.showError(error);
 console.showError(new Error('error'));
 ```
 
-### protection program's fall
+### Protection program's fall
 
 ```javascript
 var errors = require('errors')
 
 errors.activateCatcher(function(err) {
 	// logging errors
+	return false;
 })
 
 errors.activateCatcher(function(err) {
