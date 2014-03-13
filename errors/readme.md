@@ -13,7 +13,7 @@ console.err('message')
 // Error: message
 ```
 
-### create error object
+### Create error object
 
 ```javascript
 var errors = require('errors')
@@ -21,4 +21,24 @@ var error = errors.Common.create('error', {customkey1:1});
 // show errors at stderr
 console.showError(error);
 console.showError(new Error('error'));
+```
+
+### protection program's fall
+
+```javascript
+var errors = require('errors')
+
+errors.activateCatcher(function(err) {
+	// logging errors
+})
+
+errors.activateCatcher(function(err) {
+	if(err.myFatal) return true;
+	return false;
+})
+
+throw new Error('error'); // show error and continue
+
+throw errors.Common.createa('error',{myFatal:true}); // show error and terminate
+
 ```
