@@ -8,6 +8,7 @@ global.GE_PART		= 1;
 global.GE_END		= 2;
 
 function resume0(err, data) {
+	// console.log('resume0');
 	if(err) {
 
 		// console.log('fakeasync error');
@@ -25,11 +26,28 @@ function resume0(err, data) {
 }
 
 function resume3end(event, data) {
+
+	// console.log('resume3');
+
 	if(GE_ERROR === event) {
+
+		// console.log('resume3 err');
+/*
 		var result = this.generator.throw(data);
 		if(!this.checkEnd(result)) this.next();
+*/
+
+		if(this.throwErrors) {
+			var result = this.generator.throw(data);
+			if(!this.checkEnd(result)) this.next(data);
+		}
+		else {
+			if(this.callback) this.callback(GE_ERROR, data);
+		}
+
 	}
 	else if (GE_END === event) {
+		// console.log('resume3 data');
 		this.next(data);
 	}
 }

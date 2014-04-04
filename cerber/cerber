@@ -1,4 +1,4 @@
-#!/bin/node --harmony
+#!/usr/bin/env node-harmony
 'use strict';
 
 var cerber = require('./index.js')

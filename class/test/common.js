@@ -5,7 +5,7 @@ var assert = require('assert')
   , util = require('util')
 
 
-describe('Class', function(){
+describe('Module class', function(){
 
   it('common functionality', function(done){
 

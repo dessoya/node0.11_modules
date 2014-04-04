@@ -2,3 +2,9 @@
 'use strict'
 
 console.log('html builder')
+
+// console.dir(process.argv)
+if(process.argv.length < 3) {
+	console.log('syntax: htmlBuilder /path/config.json');
+	process.exit(0);
+}

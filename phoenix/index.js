@@ -147,6 +147,7 @@ var Phoenix = module.exports = Class.inherit({
 
 	onConnection: function(socket) {
 		this.sockets.push(socket);
+		// console.log('http connection '+this.sockets.length)
 		socket.on('close', function () {
 			this.sockets.splice(this.sockets.indexOf(socket), 1);
 		}.bind(this));
@@ -154,7 +155,11 @@ var Phoenix = module.exports = Class.inherit({
 	
 	onRequest: function(req, res) {
 		var info = url.parse(req.url, true);	
+		// console.log('headers: ' + JSON.stringify(req.headers));
 		var requestClass = (info.pathname in this.routing) ? this.routing[info.pathname] : _404Request;
+
+		res.setHeader('Access-Control-Allow-Origin', '*');
+
 		requestClass.create(req, res, info, this.requestOpt);
 	},
 
@@ -165,7 +170,7 @@ var Phoenix = module.exports = Class.inherit({
 	},
 	stop: function() {
 		this.onEnd();
-		staticLoader.stop();
+		// staticLoader.stop();
 	},
 
 	// requests

@@ -5,7 +5,7 @@ var assert = require('assert')
   , util = require('util')
 
 
-describe('errors', function(){
+describe('Module errors', function(){
 
   it('function console.err', function(done){
 

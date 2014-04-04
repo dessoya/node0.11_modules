@@ -237,12 +237,15 @@ function start(configPath, config, callback) {
 function getPids(config, listCallback) {
     var ps = spawn('ps', ['ax']), pid = [];
 
+	console.log('getting pids')
 	// soberem pid vseh instansov servica
 	ps.stdout.on('data', function (data) {
 		// 3238 ?        Ssl    0:00 photo_daemon
 		var re = new RegExp('(\\d+)\\s+\\S+\\s+\\S+\\s+\\S+\\s+'+config.name+'\\:');
+		// console.dir(re)
 		var a,lines = (''+data).split('\n');
 		var i = lines.length; while(i--) {
+			// console.log(lines[i])
 			if(a = re.exec(lines[i]))
 				pid.push(a[1]);
 		}
@@ -268,6 +271,7 @@ function stop(configPath, config, callback) {
 		}
 
 		var k = [];
+		console.log('pids '+pid.join(','))
 		var i = pid.length; while(i--) {
 			var p = spawn('kill', ['-9', pid[i]]);
 			k.push(p);
@@ -275,8 +279,16 @@ function stop(configPath, config, callback) {
 				pid.shift();
 				// kogda ubili vse processi vihodim sami
 				if(pid.length == 0) {
-					if(callback) callback();
-					else process.exit();
+					if(callback) {
+						setTimeout(function() {
+							callback();
+						}, 700)
+					}
+					else {
+						setTimeout(function() {
+							process.exit();
+						}, 1700)
+					}
 				}
 			});
 		}
@@ -292,32 +304,47 @@ function restart(configPath, config, callback) {
 
 function initService() {
 
+	var configExists = false;
+
 	for(var i = 0, l = process.argv.length; i < l; i++) {
 		if(process.argv[i] === optionCerberConfig) {
 			if(i + 1 < l) {
-				console.log('use config '+process.argv[i + 1]);
-				var config = JSON.parse(fs.readFileSync(process.argv[i + 1]));
-				process.title = config.name + ':service';
-				console.log('starting '+config.name+'...');
-				if(config.service_user) {
-					// todo: check for exists user
-					var info = posix.getpwnam(config.service_user)
-					posix.setuid(info[PASSWD_UID]);
-				}
+				configExists = process.argv[i + 1];
 			}
 		}
 	}
 
-	var interval = setInterval(function() {
-		http.request({
-		    host: '127.0.0.1',
-	    	port: config.sub_process_communication_port,
-		    path: '/pong',
-		    method: 'GET'
-		}).end();
-	}, 30 * 1000);
-	process.on('SIGINT', function() { clearInterval(interval); });
+	if(configExists) {
 
+		module.exports.daemonPath = path.dirname(configExists)
+		console.log('use config ' + configExists);
+		var config = JSON.parse(fs.readFileSync(configExists));
+		module.exports.config = config;
+		process.title = config.name + ':service';
+		console.log('starting '+config.name+'...');
+		if(config.daemon_user) {
+			// todo: check for exists user
+/*
+			var info = posix.getpwnam(config.daemon_user)
+			// posix.setuid(info[PASSWD_UID]);
+			process.setuid(info[PASSWD_UID])
+*/
+		}
+
+		var interval = setInterval(function() {
+			http.request({
+			    host: '127.0.0.1',
+		    	port: config.sub_process_communication_port,
+			    path: '/pong',
+			    method: 'GET'
+			}).end();
+		}, 30 * 1000);
+		process.on('SIGINT', function() { clearInterval(interval); });
+	}
+	else {
+		module.exports.daemonPath = path.dirname(require.main.filename)
+		module.exports.config = { logs_dir: module.exports.daemonPath }
+	}
 }
 
 module.exports = {
